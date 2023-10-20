@@ -2,10 +2,11 @@
 
 import React from "react";
 import SectionHeading from "./section-heading";
-import { FaPaperPlane } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useSectionInView } from "@/lib/hooks";
 import { sendEmail } from "@/actions/sendEmail";
+import SubmitBtn from "./submit-btn";
+import toast from "react-hot-toast";
 
 export default function Contact() {
   const { ref } = useSectionInView("Contact");
@@ -29,7 +30,7 @@ export default function Contact() {
       }}
     >
       <SectionHeading>Contact me</SectionHeading>
-      <p className="text-gray-700 -mt-5">
+      <p className="text-gray-700 -mt-5 dark:text-white/80">
         Please contact me directly at{" "}
         <a className="underline" href="mailto:wvent777@gmail.com">
           wvent777@gmail.com
@@ -38,7 +39,7 @@ export default function Contact() {
       </p>
 
       <form
-        className="mt-10 flex flex-col"
+        className="mt-10 flex flex-col dark:text-black"
         // can also rewrite it as just
         // action={sendEmail}
         action={async (formData) => {
@@ -46,11 +47,17 @@ export default function Contact() {
           // console.log("Running on Client");
           // console.log(formData.get("senderEmail"));
           // console.log(formData.get("message"));
-          await sendEmail(formData);
+          const { data, error } = await sendEmail(formData);
+          if (error) {
+            toast.error(error);
+            return;
+          }
+          toast.success("Email Send Successfully!");
         }}
       >
         <input
-          className="h-14 rounded-lg borderBlack px-4"
+          className="h-14 rounded-lg borderBlack px-4 dark:bg-white dark:bg-opacity-80
+          dark:focus:bg-opacity-100 transition-all ease-in-out duration-300 dark:outine-none"
           name="senderEmail"
           type="email"
           required
@@ -58,24 +65,14 @@ export default function Contact() {
           placeholder="Your Email"
         />
         <textarea
-          className="h-52 my-3 rounded-lg borderBlack p-4"
+          className="h-52 my-3 rounded-lg borderBlack p-4 dark:bg-white dark:bg-opacity-80
+          dark:focus:bg-opacity-100 transition-all ease-in-out duration-300 dark:outine-none"
           name="message"
           placeholder="Your Message"
           required
           maxLength={5000}
         />
-        <button
-          type="submit"
-          className="group flex items-center justify-center gap-2 
-          h-[3rem] w-[8rem] bg-gray-900 text-white rounded-full
-        outline-none transition-all active:scale-105 focus:scale-110 hover:scale-110 hover:bg-gray-950"
-        >
-          Submit{" "}
-          <FaPaperPlane
-            className="text-xs opacity-70 transition-all
-          group-hover:translate-x-1 group-hover:-translate-y-1"
-          />{" "}
-        </button>
+        <SubmitBtn />
       </form>
     </motion.section>
   );
